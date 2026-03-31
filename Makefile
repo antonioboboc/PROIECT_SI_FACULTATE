@@ -1,132 +1,125 @@
-# Embedded Systems Course and Labs for students from Automation and Applied Informatics from Faculty of Automation, Computers and Electronics, University of Craiova
+# Makefile for ATmega328P Project
 
-This repository is dedicated to the Embedded Systems course and labs for students from Automation and Applied Informatics from Faculty of Automation, Computers and Electronics, University of Craiova. 
+# Microcontroller Settings
+MCU = atmega328p
+F_CPU = 16000000UL
 
-If you are a student: please fork this repository and use it for your labs, homework and course. 
+# Programmer Settings
+PROGRAMMER = arduino
+PORT = /dev/cu.usbserial-2140
+BAUD = 57600
+# BAUD = 115200
 
-Found a bug or you just want to contribute to this project ? Please raise an issue and/or send a pull request.
+# Board Selection (default to nano)
+BOARD ?= nano
 
-[![Run Tests](https://github.com/mamuleanu/embedded-systems-course-atmega328p/actions/workflows/tests.yml/badge.svg)](https://github.com/mamuleanu/embedded-systems-course-atmega328p/actions/workflows/tests.yml)
+# Compiler Settings
+CC = avr-gcc
+OBJCOPY = avr-objcopy
+AVRDUDE = avrdude
 
+# Directories
+OBJDIR = obj
+BINDIR = bin
 
-## Features
+# Compiler Flags
+CFLAGS = -mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -Wall -Wextra -std=gnu99
+CFLAGS += -I. -Idrivers/gpio -Idrivers/interrupt -Idrivers/timer -Idrivers/eeprom -Idrivers/adc -Ibsp -Iutils
 
-- **No Arduino Libraries**: Direct register manipulation for maximum control and efficiency.
-- **Drivers:**: Modular, documented, and reusable.
-    - **GPIO**: Initialization, Write, Read, Toggle.
-    - **Interrupts**: External Interrupts (INT0, INT1) with callback support.
-    - **Timer**: 1ms System Tick (`Millis()`) using Timer0 CTC mode.
-    - **EEPROM**: Read, Write, Update (lifespan-aware).
-    - **ADC**: Blocking 10-bit Analog-to-Digital conversion.
-    - **PWM**: High-level wrapper for Timer1 (16-bit) and Timer2 (8-bit) PWM generation.
-- **Board Support Package (BSP)**: Pin mappings for **Arduino Nano** and **Uno**.
-- **Robust Build System**: `Makefile` for compilation, flashing, and testing.
-- **Host-Based Unit Testing**: Run unit tests on your computer without hardware using register mocking.
-- **Code Coverage**: Generate HTML reports (`lcov`) to verify test coverage.
+ifeq ($(BOARD), nano)
+    CFLAGS += -DBOARD_NANO
+else ifeq ($(BOARD), uno)
+    CFLAGS += -DBOARD_UNO
+else
+    $(error Invalid BOARD specified. Use 'nano' or 'uno')
+endif
 
-## Roadmap
+# Source Files
+SRC = src/main.c drivers/gpio/gpio.c drivers/interrupt/external_interrupt.c drivers/timer/timer0.c drivers/timer/timer1.c drivers/timer/timer2.c drivers/pwm/pwm.c drivers/eeprom/eeprom.c drivers/adc/adc.c utils/delay.c
 
-- [x] GPIO driver
-- [x] ADC driver
-- [x] EEPROM driver
-- [x] Interrupt driver
-- [x] Timer driver
-- [x] PWM driver
-- [ ] I2C driver
-- [ ] SPI driver
-- [ ] UART driver
-- [ ] Unit tests
+# Object Files
+# Replace .c extension with .o and prepend OBJDIR, keeping directory structure
+OBJ = $(patsubst %.c,$(OBJDIR)/%.o,$(SRC))
 
-## Project Structure
+# Target Name
+TARGET = $(BINDIR)/main
 
-```
-├── bsp/            # Board definitions (uno.h, nano.h)
-├── drivers/        # Hardware Abstraction Layer
-│   ├── adc/
-│   ├── eeprom/
-│   ├── gpio/
-│   ├── interrupt/
-│   └── timer/
-├── src/            # Application source code (main.c)
-├── test/           # Unit tests & Mocks
-│   ├── mocks/      # Mock AVR registers for host testing
-│   ├── framework/  # Minimal test runner
-│   └── test_*.c    # Unit test files
-├── utils/          # Helper macros (BIT manipulations)
-└── Makefile        # Build configuration
-```
+# Rules
+all: directories $(TARGET).hex
 
-## Build & Flash
+directories:
+	@mkdir -p $(BINDIR)
+	@mkdir -p $(OBJDIR)/src
+	@mkdir -p $(OBJDIR)/drivers/gpio
+	@mkdir -p $(OBJDIR)/drivers/interrupt
+	@mkdir -p $(OBJDIR)/drivers/timer
+	@mkdir -p $(OBJDIR)/drivers/eeprom
+	@mkdir -p $(OBJDIR)/drivers/adc
+	@mkdir -p $(OBJDIR)/utils
 
-### Prerequisites
-- `avr-gcc` toolchain
-- `avrdude`
-- `make`
+$(TARGET).elf: $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $^
 
-### Commands
-| Command | Description |
-|---------|-------------|
-| `make all BOARD=nano` | Compile the project for Arduino Nano. |
-| `make flash` | Flash the firmware to the connected board. |
-| `make clean` | Remove build artifacts. |
+$(TARGET).hex: $(TARGET).elf
+	$(OBJCOPY) -O ihex -R .eeprom $< $@
 
-## Testing & Coverage
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-This project supports running unit tests on your host machine (Mac/Linux) by mocking the AVR hardware registers.
+flash: $(TARGET).hex
+	$(AVRDUDE) -v -p $(MCU) -c $(PROGRAMMER) -P $(PORT) -b $(BAUD) -D -U flash:w:$<:i
 
-### Prerequisites (for coverage)
-- `gcc`
-- `lcov` (`brew install lcov`)
+clean:
+	rm -rf $(OBJDIR) $(BINDIR)
 
-### Commands
-| Command | Description |
-|---------|-------------|
-| `make test` | Compile and run all unit tests (GPIO, PWM) on the host. |
-| `make coverage` | Run tests and generate usage metrics. |
-| `make coverage-html` | Generate a visual HTML report of code coverage. |
+# Test Runner Rule (Host GCC)
+# Compiles test_gpio.c + registers.c
+test_gpio: directories
+	@mkdir -p $(BINDIR)/test
+	gcc -I. -Isrc -Idrivers/gpio -Idrivers/interrupt -Idrivers/timer -Idrivers/eeprom -Idrivers/adc -Ibsp -Iutils -Itest -Itest/mocks -DUNIT_TEST -o $(BINDIR)/test/test_gpio test/test_gpio.c test/mocks/registers.c
+	@echo "Running GPIO Tests..."
+	@./$(BINDIR)/test/test_gpio
 
-![Code Coverage Example](/img/code_coverage_example.png)
+test_pwm: directories
+	@mkdir -p $(BINDIR)/test
+	gcc -I. -Isrc -Idrivers/gpio -Idrivers/interrupt -Idrivers/timer -Idrivers/eeprom -Idrivers/adc -Ibsp -Iutils -Itest -Itest/mocks -DUNIT_TEST -o $(BINDIR)/test/test_pwm test/test_pwm.c drivers/timer/timer1.c drivers/timer/timer2.c test/mocks/registers.c
+	@echo "Running PWM Tests..."
+	@./$(BINDIR)/test/test_pwm
 
-## Usage Example
+test_pwm_wrapper: directories
+	@mkdir -p $(BINDIR)/test
+	gcc -I. -Isrc -Idrivers/gpio -Idrivers/interrupt -Idrivers/timer -Idrivers/pwm -Idrivers/eeprom -Idrivers/adc -Ibsp -Iutils -Itest -Itest/mocks -DUNIT_TEST -o $(BINDIR)/test/test_pwm_wrapper test/test_pwm_wrapper.c drivers/timer/timer1.c drivers/timer/timer2.c drivers/pwm/pwm.c test/mocks/registers.c
+	# Run all tests
+test: test_gpio test_pwm test_pwm_wrapper
+	@echo "All tests passed!"
 
-```c
-#include "drivers/gpio/gpio.h"
-#include "drivers/timer/timer0.h"
-#include "bsp/nano.h"
+# Code Coverage Target
+coverage: directories
+	@mkdir -p $(BINDIR)/coverage
+	@echo "Compiling for Coverage..."
+	# Compile objects separately to ensure .gcno files are named correctly
+	gcc --coverage -O0 -c -I. -Isrc -Idrivers/gpio -Idrivers/interrupt -Idrivers/timer -Idrivers/eeprom -Idrivers/adc -Ibsp -Iutils -Itest -Itest/mocks -DUNIT_TEST -o $(BINDIR)/coverage/test_gpio.o test/test_gpio.c
+	gcc --coverage -O0 -c -I. -Isrc -Itest/mocks -DUNIT_TEST -o $(BINDIR)/coverage/registers.o test/mocks/registers.c
+	# Link
+	gcc --coverage -O0 -o $(BINDIR)/coverage/test_gpio_cov $(BINDIR)/coverage/test_gpio.o $(BINDIR)/coverage/registers.o
+	@echo "Running Tests to generate profile data..."
+	@./$(BINDIR)/coverage/test_gpio_cov
+	@echo "Generating GCOV reports..."
+	# Run gcov on the object file
+	gcov -o $(BINDIR)/coverage/test_gpio.o test/test_gpio.c
+	# Move gcov files to coverage dir
+	mv *.gcov $(BINDIR)/coverage/
 
-int main(void) {
-    
-    Timer0_Init();
-    GPIO_Init(LED_BUILTIN, GPIO_OUTPUT);
+# HTML Coverage Report (Requires lcov)
+coverage-html: coverage
+	@mkdir -p $(BINDIR)/coverage/html
+	@echo "Capturing LCOV data..."
+	lcov --capture --directory $(BINDIR)/coverage --base-directory . --output-file $(BINDIR)/coverage/coverage.info --ignore-errors unsupported
+	@echo "Filtering unwanted files (system libraries, tests, mocks)..."
+	lcov --remove $(BINDIR)/coverage/coverage.info '/usr/*' 'test/*' 'utils/*' --output-file $(BINDIR)/coverage/coverage_cleaned.info --ignore-errors unused,unsupported
+	@echo "Generating HTML report..."
+	genhtml $(BINDIR)/coverage/coverage_cleaned.info --output-directory $(BINDIR)/coverage/html --ignore-errors unsupported
+	@echo "Report generated at $(BINDIR)/coverage/html/index.html"
 
-    uint32_t last_time = 0;
-
-    while (1) {
-            
-        if (Millis() - last_time >= 1000) {
-            last_time = Millis();
-            GPIO_Toggle(LED_BUILTIN);
-        }
-    }
-}
-
-// PWM Usage Example
-#include "drivers/pwm/pwm.h"
-#include "bsp/uno.h"
-
-int pwm_example(void) {
-    // 50Hz for Servo on D9
-    PWM_Init(UNO_D9, 50);
-    // 1.5ms pulse (approx neutral)
-    // Duty cycle calculation: (1.5ms / 20ms) * ICR1_TOP
-    // Wrapper takes 0-255: (1.5/20)*255 = ~19
-    PWM_SetDutyCycle(UNO_D9, 19);
-
-    // 1kHz LED Dimming on D11
-    PWM_Init(UNO_D11, 1000);
-    PWM_SetDutyCycle(UNO_D11, 128); // 50%
-    
-    return 0;
-}
-```
-
+.PHONY: all flash clean directories test coverage coverage-html
