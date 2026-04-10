@@ -1,0 +1,15 @@
+#ifndef APP_CONFIG_H
+#define APP_CONFIG_H
+
+#define RADAR_STATE_SAFE 0
+#define RADAR_STATE_WARNING 1
+
+#define RADAR_ALERT_DISTANCE_CM 20
+
+#define SERVO_MIN_ANGLE 0
+#define SERVO_MAX_ANGLE 180
+#define SERVO_STEP_ANGLE 10
+
+#define SERVO_SETTLE_DELAY_MS 200
+
+#endif
