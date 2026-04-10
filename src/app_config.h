@@ -1,5 +1,6 @@
 #ifndef APP_CONFIG_H
 #define APP_CONFIG_H
+#include "bsp/nano.h"
 
 #define RADAR_STATE_SAFE 0
 #define RADAR_STATE_WARNING 1
@@ -11,5 +12,14 @@
 #define SERVO_STEP_ANGLE 10
 
 #define SERVO_SETTLE_DELAY_MS 200
+
+#define SERVO_PIN D9
+#define ULTRASONIC_TRIG_PIN D10
+#define ULTRASONIC_ECHO_PIN D11
+#define BUZZER_PIN D2
+#define RED_LED1_PIN D3
+#define RED_LED2_PIN D4
+#define GREEN_LED1_PIN D5
+#define GREEN_LED2_PIN D6
 
 #endif
