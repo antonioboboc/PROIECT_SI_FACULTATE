@@ -4,11 +4,12 @@
 #include <stdint.h>
 #include "radar_app.h"
 
+
 int main(void) {
     
     Timer0_Init();
 
-    uint8_t distance_cm = 10;
+    uint8_t distance_cm = 11;
     uint8_t radar_state;
     
     Radar_Init();
@@ -16,7 +17,7 @@ int main(void) {
     while (1) {
             
        radar_state = Radar_return_state(distance_cm);
-        if(radar_state <= RADAR_STATE_WARNING) {
+        if(radar_state == RADAR_STATE_WARNING) {
             Radar_WarningStateAction();
         } 
         else {
