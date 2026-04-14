@@ -24,8 +24,7 @@ BINDIR = bin
 
 # Compiler Flags
 CFLAGS = -mmcu=$(MCU) -DF_CPU=$(F_CPU) -Os -Wall -Wextra -std=gnu99
-CFLAGS += -I. -Idrivers/gpio -Idrivers/interrupt -Idrivers/timer -Idrivers/eeprom -Idrivers/adc -Ibsp -Iutils -Idrivers/buzzer
-
+CFLAGS += -I. -Isrc -Idrivers/gpio -Idrivers/interrupt -Idrivers/timer -Idrivers/pwm -Idrivers/servo -Idrivers/buzzer -Idrivers/eeprom -Idrivers/adc -Ibsp -Iutils
 ifeq ($(BOARD), nano)
     CFLAGS += -DBOARD_NANO
 else ifeq ($(BOARD), uno)
@@ -35,7 +34,7 @@ else
 endif
 
 # Source Files
-SRC = src/main.c src/radar_app.c drivers/gpio/gpio.c drivers/interrupt/external_interrupt.c drivers/timer/timer0.c drivers/timer/timer1.c drivers/timer/timer2.c drivers/pwm/pwm.c drivers/eeprom/eeprom.c drivers/adc/adc.c utils/delay.c drivers/buzzer/buzzer.c
+SRC = src/main.c src/radar_app.c drivers/servo/servo.c drivers/buzzer/buzzer.c drivers/gpio/gpio.c drivers/interrupt/external_interrupt.c drivers/timer/timer0.c drivers/timer/timer1.c drivers/timer/timer2.c drivers/pwm/pwm.c drivers/eeprom/eeprom.c drivers/adc/adc.c utils/delay.c
 # Object Files
 # Replace .c extension with .o and prepend OBJDIR, keeping directory structure
 OBJ = $(patsubst %.c,$(OBJDIR)/%.o,$(SRC))
@@ -55,6 +54,8 @@ directories:
 	@mkdir -p $(OBJDIR)/drivers/eeprom
 	@mkdir -p $(OBJDIR)/drivers/adc
 	@mkdir -p $(OBJDIR)/utils
+	@mkdir -p $(OBJDIR)/drivers/servo
+	@mkdir -p $(OBJDIR)/drivers/pwm
 
 $(TARGET).elf: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
