@@ -1,6 +1,8 @@
 #include "drivers/gpio/gpio.h"
 #include "drivers/timer/timer0.h"
+#include "drivers/buzzer/buzzer.h"
 #include "bsp/nano.h"
+#include "delay.h"
 #include <stdint.h>
 #include "radar_app.h"
 #include "drivers/servo/servo.h"
@@ -8,15 +10,13 @@
 
 
 int main(void) {
-    
-    uint8_t distance_cm = 11;
-    uint8_t radar_state;
+
 
    Timer0_Init();   /* system tick for Delay() */
     Servo_Init();    /* D9 / OC1A – 50 Hz, starts at 90° */
 	
     while (1) {
-        
+
 
         radar_state = Radar_return_state(distance_cm);
         if(radar_state == RADAR_STATE_WARNING) {
