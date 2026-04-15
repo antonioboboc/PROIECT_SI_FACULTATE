@@ -1,4 +1,4 @@
-#include "hcsr04.h"
+#include "ultrasonic.h"
 #include <util/delay.h>
 
 // CONFIGURARE PINI
@@ -18,7 +18,7 @@ static void Timer1_Init()
     TCNT1 = 0;
 }
 
-void HCSR04_Init(void)
+void ultrasonic_Init(void)
 {
     // TRIG = output
     TRIG_DDR |= (1 << TRIG_PIN);
@@ -41,7 +41,7 @@ static void trigger_pulse()
     TRIG_PORT &= ~(1 << TRIG_PIN);
 }
 
-uint16_t HCSR04_Read(void)
+uint16_t ultrasonic_Read(void)
 {
     uint16_t time = 0;
 

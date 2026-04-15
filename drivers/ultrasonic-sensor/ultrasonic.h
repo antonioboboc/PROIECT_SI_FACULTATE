@@ -1,9 +1,9 @@
-#ifndef HCSR04_H_
-#define HCSR04_H_
+#ifndef ultrasonic
+#define ultrasonic
 
 #include <avr/io.h>
 
-void HCSR04_Init(void);
-uint16_t HCSR04_Read(void); 
+void ultrasonic_Init(void);
+uint16_t ultrasonic_Read(void); 
 
 #endif
