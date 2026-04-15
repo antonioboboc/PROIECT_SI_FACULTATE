@@ -11,8 +11,10 @@
 
 int main(void) {
 
+    uint8_t radar_state;
+    uint8_t distance_cm = 10; 
 
-   Timer0_Init();   /* system tick for Delay() */
+    Timer0_Init();   /* system tick for Delay() */
     Servo_Init();    /* D9 / OC1A – 50 Hz, starts at 90° */
 	
     while (1) {
