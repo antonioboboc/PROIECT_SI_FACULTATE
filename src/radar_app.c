@@ -1,6 +1,8 @@
 #include "radar_app.h"
 #include "drivers/gpio/gpio.h"
 #include "bsp/nano.h"
+#include "ultrasonic.h"
+#include "buzzer.h"  
 
 uint8_t Radar_return_state(uint8_t distance_cm) {
     if (distance_cm <= RADAR_ALERT_DISTANCE_CM) {
