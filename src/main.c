@@ -8,46 +8,12 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-// static uint8_t Radar_CheckForObstacle(void) {
-//     uint16_t distance_cm = ultrasonic_Read();
-//     return Radar_return_state((uint8_t)distance_cm);
-// }
+ static uint8_t Radar_CheckForObstacle(void) {
+         uint16_t distance_cm = ultrasonic_Read();
+     return Radar_return_state((uint8_t)distance_cm);
+ }
 
 
-#define DEBOUNCE_SAMPLES     3U
-#define DEBOUNCE_DELAY_MS    10U
- 
-static uint8_t Radar_CheckForObstacle(void) {
-    uint8_t warning_count = 0U;
-    uint8_t valid_count   = 0U;
- 
-    for (uint8_t i = 0U; i < DEBOUNCE_SAMPLES; i++) {
-        uint16_t dist = ultrasonic_Read();
- 
-        if (dist == 0U) {
-            /* timeout — citire invalida, ignoram */
-            Delay(DEBOUNCE_DELAY_MS);
-            continue;
-        }
- 
-        valid_count++;
-        if (Radar_return_state((uint8_t)dist) == RADAR_STATE_WARNING) {
-            warning_count++;
-        }
- 
-        Delay(DEBOUNCE_DELAY_MS);
-    }
- 
-    /* WARNING doar daca toate citirile valide confirma obiectul */
-    if (valid_count > 0U && warning_count == valid_count) {
-        return RADAR_STATE_WARNING;
-    }
- 
-    return RADAR_STATE_SAFE;
-}
- 
-/* ------------------------------------------------------------------ */
- 
 int main(void) {
     uint8_t current_angle   = SERVO_MIN_ANGLE;
     int8_t  sweep_direction = 1;
