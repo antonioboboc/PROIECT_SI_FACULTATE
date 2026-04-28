@@ -11,6 +11,11 @@ uint8_t Radar_return_state(uint8_t distance_cm) {
     }
 }
 
+ uint8_t Radar_CheckForObstacle(void) {
+         uint16_t distance_cm = ultrasonic_Read();
+     return Radar_return_state((uint8_t)distance_cm);
+ }
+
 void  Radar_Init(void) {
     GPIO_Init(RED_LED1_PIN, GPIO_OUTPUT);
     GPIO_Init(RED_LED2_PIN, GPIO_OUTPUT);

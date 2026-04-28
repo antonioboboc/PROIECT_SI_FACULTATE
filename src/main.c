@@ -8,10 +8,7 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
- static uint8_t Radar_CheckForObstacle(void) {
-         uint16_t distance_cm = ultrasonic_Read();
-     return Radar_return_state((uint8_t)distance_cm);
- }
+
 
 
 int main(void) {
