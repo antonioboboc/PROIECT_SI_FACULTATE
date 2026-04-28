@@ -22,15 +22,20 @@ void  Radar_Init(void) {
 void  Radar_SafeStateAction(void) {
     GPIO_Write(GREEN_LED1_PIN, GPIO_HIGH);
     GPIO_Write(GREEN_LED2_PIN, GPIO_HIGH);
+   
 
     GPIO_Write(RED_LED1_PIN, GPIO_LOW);
     GPIO_Write(RED_LED2_PIN, GPIO_LOW);
+    Buzzer_Stop();
 }
 
 void Radar_WarningStateAction(void) {
     GPIO_Write(RED_LED1_PIN, GPIO_HIGH);
     GPIO_Write(RED_LED2_PIN, GPIO_HIGH);
+    Buzzer_Start(BUZZER_ALERT_FREQUENCY_HZ);
 
     GPIO_Write(GREEN_LED1_PIN, GPIO_LOW);
     GPIO_Write(GREEN_LED2_PIN, GPIO_LOW);
+   
+
 }
