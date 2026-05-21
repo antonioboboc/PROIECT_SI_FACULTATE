@@ -34,6 +34,10 @@ void  Radar_SafeStateAction(void) {
     GPIO_Write(RED_LED1_PIN, GPIO_LOW);
     GPIO_Write(RED_LED2_PIN, GPIO_LOW);
     Buzzer_Stop();
+
+    LCD_Clear();
+    LCD_SetCursor(0, 0);
+    LCD_Print("Area is clear");
 }
 
 void Radar_WarningStateAction(void) {
@@ -43,6 +47,8 @@ void Radar_WarningStateAction(void) {
 
     GPIO_Write(GREEN_LED1_PIN, GPIO_LOW);
     GPIO_Write(GREEN_LED2_PIN, GPIO_LOW);
-   
+    LCD_Clear();
+    LCD_SetCursor(0, 0);
+    LCD_Print("Foreign object");
 
 }
