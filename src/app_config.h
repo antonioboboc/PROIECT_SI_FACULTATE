@@ -24,6 +24,8 @@
 #define RED_LED2_PIN D4
 #define GREEN_LED1_PIN D5
 #define GREEN_LED2_PIN D6
+//SDA-A4
+//SCL-A5
 
 #endif
 

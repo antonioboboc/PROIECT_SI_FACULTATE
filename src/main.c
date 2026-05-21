@@ -1,28 +1,29 @@
-#include "drivers/buzzer/buzzer.h"
-#include "drivers/servo/servo.h"
-#include "drivers/ultrasonic-sensor/ultrasonic.h"
-#include "src/app_config.h"
-#include "src/radar_app.h"
-#include "utils/delay.h"
-#include <stdint.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-
+ #include "drivers/buzzer/buzzer.h"
+ #include "drivers/servo/servo.h"
+ #include "drivers/ultrasonic-sensor/ultrasonic.h"
+ #include "src/app_config.h"
+ #include "src/radar_app.h"
+ #include "utils/delay.h"
+ #include <stdint.h>
+ #include <avr/io.h>
+ #include <avr/interrupt.h>
 
 
 int main(void) {
     uint8_t current_angle   = SERVO_MIN_ANGLE;
     int8_t  sweep_direction = 1;
     uint8_t buzzer_on       = 0U;
+    // Delay(200);
  
     Servo_Init();
     ultrasonic_Init();
     Radar_Init();
+    // Delay(200);
     Buzzer_Init();
     
     Radar_SafeStateAction();
     Servo_SetAngle(current_angle);
+    // Delay(200);
  
     while (1) {
  
