@@ -3,6 +3,8 @@
 #include "bsp/nano.h"
 #include "ultrasonic.h"
 #include "buzzer.h"  
+#include "lcd.h"
+
 
 uint8_t Radar_return_state(uint8_t distance_cm) {
     if (distance_cm <= RADAR_ALERT_DISTANCE_CM) {
@@ -37,7 +39,7 @@ void  Radar_SafeStateAction(void) {
 
     LCD_Clear();
     LCD_SetCursor(0, 0);
-    LCD_Print("Area is clear");
+    LCD_Print("Niciun obiect");
 }
 
 void Radar_WarningStateAction(void) {
@@ -49,6 +51,6 @@ void Radar_WarningStateAction(void) {
     GPIO_Write(GREEN_LED2_PIN, GPIO_LOW);
     LCD_Clear();
     LCD_SetCursor(0, 0);
-    LCD_Print("Foreign object");
+    LCD_Print("Obiect detectat!");
 
 }

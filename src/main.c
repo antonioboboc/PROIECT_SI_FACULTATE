@@ -7,6 +7,8 @@
  #include <stdint.h>
  #include <avr/io.h>
  #include <avr/interrupt.h>
+ #include "drivers/lcd/lcd.h"
+
 
 
 int main(void) {
@@ -15,6 +17,8 @@ int main(void) {
     uint8_t buzzer_on       = 0U;
     // Delay(200);
  
+    
+    LCD_Init();
     Servo_Init();
     ultrasonic_Init();
     Radar_Init();
