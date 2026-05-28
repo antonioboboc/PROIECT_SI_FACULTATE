@@ -17,7 +17,9 @@ A bare-metal embedded system that monitors the surrounding area by scanning it w
 - [Contributors](#contributors)
 
 ---
+## Hardware Setup
 
+<img src="img/Radar_image.jpeg.jpg" alt="Hardware setup" width="600">
 ## Overview
 
 The system rotates an HC-SR04 ultrasonic sensor across a 180° arc using an SG90 servo motor.
